@@ -57,7 +57,7 @@ android {
         compose = true
         prefab = true
     }
-    sourceSets["main"].java.srcDir("src/main/cpp/sdl2/android-project/app/src/main/java")
+    sourceSets["main"].java.srcDir("src/main/cpp/SDL2/android-project/app/src/main/java")
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.8"
     }

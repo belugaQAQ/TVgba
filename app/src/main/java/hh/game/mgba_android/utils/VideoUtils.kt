@@ -30,7 +30,7 @@ class VideoUtils {
                 handlerThread.start();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     PixelCopy.request(
-                        videoView, bitmap,
+                        videoView as android.view.SurfaceView, bitmap,
                         PixelCopy.OnPixelCopyFinishedListener { copyResult ->
                             if (copyResult == PixelCopy.SUCCESS) {
                                 callback(bitmap)

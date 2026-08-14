@@ -1,0 +1,67 @@
+name: Android Debug APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout application
+        uses: actions/checkout@v4
+
+      - name: Checkout SDL2
+        uses: actions/checkout@v4
+        with:
+          repository: libsdl-org/SDL
+          ref: release-2.30.9
+          path: app/src/main/cpp/SDL2
+          fetch-depth: 1
+
+      - name: Checkout mGBA
+        uses: actions/checkout@v4
+        with:
+          repository: mgba-emu/mgba
+          ref: 0.10.4
+          path: app/src/main/cpp/mgba
+          fetch-depth: 1
+
+      - name: Check native dependencies
+        shell: bash
+        run: |
+          test -f app/src/main/cpp/SDL2/CMakeLists.txt
+          test -f app/src/main/cpp/mgba/CMakeLists.txt
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.6'
+
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses || true
+
+      - name: Install Android build tools
+        run: |
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" "cmake;3.22.1" "ndk;25.1.8937393"
+
+      - name: Build debug APK
+        run: gradle --no-daemon --stacktrace :app:assembleDebug
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: mgba-android-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error

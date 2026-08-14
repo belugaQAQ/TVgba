@@ -368,8 +368,7 @@ int mSDLRun(struct mSDLRenderer* renderer, struct mArguments* args) {
         mSDLSetScreensaverSuspendable(&renderer->events, renderer->core->opts.suspendScreensaver);
         mSDLSuspendScreensaver(&renderer->events);
 //#endif
-        // if (mSDLInitAudio(&renderer->audio, &thread)) {
-        if (mOboeInit(&thread)) {
+        if (mSDLInitAudio(&renderer->audio, &thread)) {
             if (args->savestate) {
                 struct VFile* state = VFileOpen(args->savestate, O_RDONLY);
                 if (state) {
@@ -384,7 +383,7 @@ int mSDLRun(struct mSDLRenderer* renderer, struct mArguments* args) {
             // Execute Action Replay DS Logic Engine
             ARDS_Run(androidrenderer.core);
 
-            // mSDLPauseAudio(&renderer->audio);
+            mSDLPauseAudio(&renderer->audio);
             if (mCoreThreadHasCrashed(&thread)) {
                 didFail = true;
                 LOG_D("The game crashed!\n");
@@ -415,8 +414,7 @@ int mSDLRun(struct mSDLRenderer* renderer, struct mArguments* args) {
 
 static void mSDLDeinit(struct mSDLRenderer* renderer) {
     mSDLDeinitEvents(&renderer->events);
-    // mSDLDeinitAudio(&renderer->audio);
-    mOboeDeinit();
+    mSDLDeinitAudio(&renderer->audio);
 #if SDL_VERSION_ATLEAST(2, 0, 0)
     SDL_DestroyWindow(renderer->window);
 #endif
